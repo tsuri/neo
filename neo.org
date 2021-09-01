@@ -211,6 +211,91 @@ no-littering.
 
 * Completion
 
+#+BEGIN_SRC emacs-lisp
+(use-package ivy)
+#+END_SRC
+
+#+begin_src emacs-lisp
+  (use-package ivy-rich
+:config
+  (setq ivy-rich--original-display-transformers-list nil)  ;; needs to be set otherwise (ivy-rich-set-display-transformer) does not get called
+  (ivy-set-display-transformer 'ivy-switch-buffer
+                               'ivy-rich-switch-buffer-transformer)
+  (setq-default ivy-rich-path-style 'abbrev
+                ivy-virtual-abbreviate 'full
+                ivy-rich-switch-buffer-align-virtual-buffer t)
+  :after all-the-icons-ivy-rich
+    :init
+    (ivy-rich-mode 1))
+#+end_src
+
+#+begin_src emacs-lisp
+    (use-package counsel
+      :config
+      (ivy-mode 1)
+      :bind
+("<f2> f" . 'counsel-describe-function)
+("<f2> v" . 'counsel-describe-variable)
+("<f2> o" . 'counsel-describe-symbol)
+("<f2> l" . 'counsel-find-library)
+("<f2> u" . counsel-unicode-char)
+)
+#+end_src
+
+#+begin_src emacs-list
+(use-package all-the-icons-ivy-rich
+  :after ivy
+:config
+(setq all-the-icons-ivy-rich-color-icon t)
+(setq all-the-icons-ivy-rich-icon-size 1.0)
+(setq all-the-icons-ivy-rich-project t)
+  :init (all-the-icons-ivy-rich-mode 1))
+#+end_src
+
+
+
+#+begin_src emacs-lisp
+(use-package prescient)
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package ivy-prescient
+  :after counsel
+  :config
+  (ivy-prescient-mode 1)
+  (prescient-persist-mode 1)
+  )
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package company
+    :bind (:map company-active-map
+	   ("TAB" . company-complexivte-common-or-cycle)
+	   ("<tab>" . company-complete-common-or-cycle)
+	   ("<S-Tab>" . company-select-previous)
+	   ("<backtab>" . company-select-previous)
+	   ("C-n" . company-select-next)
+	   ("C-p" . company-select-previous))
+    :hook (after-init . global-company-mode)
+    :custom
+    (company-require-match 'never)
+    (company-minimum-prefix-length 2)
+    (company-tooltip-align-annotations t)
+    (company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
+			 company-preview-frontend
+			 company-echo-metadata-frontend))
+    (company-backends '(company-capf company-files))
+    (company-tooltip-minimum-width 30)
+    (company-tooltip-maximum-width 60))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package company-prescient
+:after company
+:config
+(company-prescient-mode 1))
+#+end_src
+
 * User Interface
 ** Appearance
 *** Themes
