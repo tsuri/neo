@@ -310,6 +310,42 @@ no-littering.
 * Software Development
 
 ** Version Control
+
+*** Git
+
+#+begin_src emacs-lisp
+(use-package git-timemachine :bind ("<f12> t" . 'git-timemachine))
+#+end_src
+
+#+begin_src emacs-lisp
+;  (use-package git-gutter+
+;    :config (global-git-gutter+-mode))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package git-gutter-fringe+) ; :after git-gutter+)
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package dired-git-info
+    :bind (:map dired-mode-map
+           (")" . dired-git-info-mode)))
+#+end_src
+
+
+*** Magit
+I use magit for interacting with git repositories. And I'm forcing
+myself to use the command line git as little as possible.
+#+begin_src emacs-lisp
+  (use-package magit
+    :config
+    (setq magit-save-repository-buffers 'dontask)
+    :bind
+    ("<f12> s" . 'magit-status)
+    ("<f12> g" . 'counsel-git-grep)
+    )
+#+end_src
+
 ** Linters
 ** Languages
 *** Emacs Lisp
