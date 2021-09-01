@@ -230,16 +230,17 @@ no-littering.
 #+end_src
 
 #+begin_src emacs-lisp
-    (use-package counsel
-      :config
-      (ivy-mode 1)
-      :bind
-("<f2> f" . 'counsel-describe-function)
-("<f2> v" . 'counsel-describe-variable)
-("<f2> o" . 'counsel-describe-symbol)
-("<f2> l" . 'counsel-find-library)
-("<f2> u" . counsel-unicode-char)
-)
+  (use-package counsel
+    :config
+    (ivy-mode 1)
+    :bind
+    ("<f2> f" . 'counsel-describe-function)
+    ("<f2> v" . 'counsel-describe-variable)
+    ("<f2> o" . 'counsel-describe-symbol)
+    ("<f2> l" . 'counsel-find-library)
+    ("<f2> u" . 'counsel-unicode-char)
+    )
+  
 #+end_src
 
 #+begin_src emacs-list
