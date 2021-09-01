@@ -343,10 +343,12 @@ myself to use the command line git as little as possible.
     :custom
     (magit-list-refs-sortby "-creatordate") ; doesn't seem to have any effect
     (magit-refs-show-commit-count 'branch) ; may be too expensive
+    ; TODO: this should be the default behavior of magit-builtin-completing-read
+    ; when ivy is enabed gobally. But I am not sure of what is the actual situation.
+    (magit-completing-read-function 'ivy-completing-read)
     :bind
     ("<f12> s" . 'magit-status)
-    ("<f12> g" . 'counsel-git-grep)
-    )
+    ("<f12> g" . 'counsel-git-grep))
 #+end_src
 
 ** Linters
