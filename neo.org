@@ -340,6 +340,9 @@ myself to use the command line git as little as possible.
   (use-package magit
     :config
     (setq magit-save-repository-buffers 'dontask)
+    :custom
+    (magit-list-refs-sortby "-creatordate") ; doesn't seem to have any effect
+    (magit-refs-show-commit-count 'branch) ; may be too expensive
     :bind
     ("<f12> s" . 'magit-status)
     ("<f12> g" . 'counsel-git-grep)
