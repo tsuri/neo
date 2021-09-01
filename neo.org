@@ -212,20 +212,19 @@ no-littering.
 * Completion
 
 #+BEGIN_SRC emacs-lisp
-(use-package ivy)
+  (use-package ivy)
 #+END_SRC
 
 #+begin_src emacs-lisp
   (use-package ivy-rich
-:config
-  (setq ivy-rich--original-display-transformers-list nil)  ;; needs to be set otherwise (ivy-rich-set-display-transformer) does not get called
-  (ivy-set-display-transformer 'ivy-switch-buffer
-                               'ivy-rich-switch-buffer-transformer)
-  (setq-default ivy-rich-path-style 'abbrev
-                ivy-virtual-abbreviate 'full
-                ivy-rich-switch-buffer-align-virtual-buffer t)
-  :after all-the-icons-ivy-rich
-    :init
+    :after all-the-icons-ivy-rich
+    :config
+    (setq ivy-rich--original-display-transformers-list nil)  ;; needs to be set otherwise (ivy-rich-set-display-transformer) does not get called
+    (ivy-set-display-transformer 'ivy-switch-buffer
+				 'ivy-rich-switch-buffer-transformer)
+    (setq-default ivy-rich-path-style 'abbrev
+		  ivy-virtual-abbreviate 'full
+		  ivy-rich-switch-buffer-align-virtual-buffer t)
     (ivy-rich-mode 1))
 #+end_src
 
@@ -238,34 +237,31 @@ no-littering.
     ("<f2> v" . 'counsel-describe-variable)
     ("<f2> o" . 'counsel-describe-symbol)
     ("<f2> l" . 'counsel-find-library)
-    ("<f2> u" . 'counsel-unicode-char)
-    )
-  
+    ("<f2> u" . 'counsel-unicode-char))
 #+end_src
 
-#+begin_src emacs-list
-(use-package all-the-icons-ivy-rich
-  :after ivy
-:config
-(setq all-the-icons-ivy-rich-color-icon t)
-(setq all-the-icons-ivy-rich-icon-size 1.0)
-(setq all-the-icons-ivy-rich-project t)
-  :init (all-the-icons-ivy-rich-mode 1))
+#+begin_src emacs-lisp
+  (use-package all-the-icons-ivy-rich
+    :after ivy
+    :config
+    (setq all-the-icons-ivy-rich-color-icon t)
+    (setq all-the-icons-ivy-rich-icon-size 1.0)
+    (setq all-the-icons-ivy-rich-project t)
+    (all-the-icons-ivy-rich-mode 1))
 #+end_src
 
 
 
 #+begin_src emacs-lisp
-(use-package prescient)
+  (use-package prescient)
 #+end_src
 
 #+begin_src emacs-lisp
   (use-package ivy-prescient
-  :after counsel
-  :config
-  (ivy-prescient-mode 1)
-  (prescient-persist-mode 1)
-  )
+    :after counsel
+    :config
+    (ivy-prescient-mode 1)
+    (prescient-persist-mode 1))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -291,10 +287,10 @@ no-littering.
 #+end_src
 
 #+begin_src emacs-lisp
-(use-package company-prescient
-:after company
-:config
-(company-prescient-mode 1))
+  (use-package company-prescient
+    :after company
+    :config
+    (company-prescient-mode 1))
 #+end_src
 
 * User Interface
