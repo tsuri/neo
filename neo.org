@@ -209,6 +209,8 @@ no-littering.
 ** Secrets
 ** Misc
 
+* Completion
+
 * User Interface
 ** Appearance
 *** Themes
