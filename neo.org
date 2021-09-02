@@ -385,6 +385,41 @@ myself to use the command line git as little as possible.
 
 * Applications
 ** Org Mode
+
+I install the org-mode package very early in the init process because
+I want to use a newer version than what comes with Emacs.
+
+#+begin_src emacs-lisp
+  (use-package org-mode
+    :hook
+    (org-mode . neo/org-mode-setup))
+#+end_src
+
+#+begin_src emacs-lisp
+  (defun neo/org-mode-setup ()
+    (setq org-startup-indented t)
+    (setq org-src-tab-acts-natively t)
+    (org-indent-mode)
+    (auto-fill-mode 1))
+#+end_src
+
+*** Beautification
+
+#+begin_src emacs-lisp
+  (use-package org-superstar
+    :config
+    (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+    ;; (setq org-superstar-headline-bullets-list '("☰" "☷" "☵" "☲"  "☳" "☴"  "☶"  "☱" ))
+    ;; (setq org-superstar-headline-bullets-list '("✖" "✚" "◉" "○" "▶"))
+    (setq org-superstar-headline-bullets-list '("◆"))
+    (setq org-superstar-cycle-headline-bullets nil)
+    (setq org-ellipsis " ↴ ")
+    ;; TODO this is something that should be done at every theme switch.
+    ;; we should have some form of hooks where we also generate a ~/.Xdefaults
+    (set-face-foreground 'org-superstar-leading (face-attribute 'default :background)))
+#+end_src
+
+
 ** Dashboard
 ** Calculator
 ** Calendar
