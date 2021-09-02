@@ -397,10 +397,36 @@ I want to use a newer version than what comes with Emacs.
 
 #+begin_src emacs-lisp
   (defun neo/org-mode-setup ()
+    (neo/org-mode-prettify)
     (setq org-startup-indented t)
     (setq org-src-tab-acts-natively t)
     (org-indent-mode)
     (auto-fill-mode 1))
+#+end_src
+
+#+begin_src emacs-lisp
+  (defun neo/org-mode-prettify ()
+    (setq-default prettify-symbols-alist '(("#+BEGIN_SRC" . "†")
+					   ("#+END_SRC" . "†")
+					   ("#+begin_src" . "†")
+					   ("#+end_src" . "†")
+					   ("#+BEGIN_EXAMPLE" . (?ℰ (Br . Bl) ?⇒)) ;; ℰ⇒
+					   ("#+END_EXAMPLE"    . ?⇐)               ;; ⇐
+					   ("#+begin_example" . (?ℰ (Br . Bl) ?⇒)) ;; ℰ⇒
+					   ("#+end_example"    . ?⇐)               ;; ⇐
+					   ("#+BEGIN_QUOTE" . (?𝒬 (Br . Bl) ?⇒))   ;; 𝒬⇒
+					   ("#+END_QUOTE"    . ?⇐)                 ;; ⇐
+					   ("#+begin_quote" . (?𝒬 (Br . Bl) ?⇒))   ;; 𝒬⇒
+					   ("#+end_quote"    . ?⇐)                 ;; ⇐
+					   ("[ ]" .  "☐") 
+					   ("[X]" . "☑" ) 
+					   ("[-]" . "❍" ) 
+					   ("<=" . ?≤)
+					   (">=" . "≥")
+					   ("=>" . "⇨")))
+    (setq prettify-symbols-unprettify-at-point 'right-edge)
+    ;; TODO there's a better way to enable this
+    (prettify-symbols-mode))
 #+end_src
 
 *** Beautification
