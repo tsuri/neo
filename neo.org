@@ -82,6 +82,28 @@ arguments from the ~/proc~ file system, I only care about Linux anyhow.
 ** Reasonable Defaults
 Speaking only for myself, claro?
 
+#+begin_src emacs-lisp
+  (use-package emacs
+    :config
+    (setq message-log-max 10000) ; I cannot have t as my Emacs stays on forever
+    (setq kill-whole-line t)
+    (setq visible-bell 1)
+    (setq initial-scratch-message "")
+    (setq inhibit-splash-screen t)
+    (setq inhibit-startup-screen t)
+    (setq inhibit-startup-buffer-menu t)
+    (setq use-dialog-box nil)
+    (setq ring-bell-function 'ignore)
+    (setq custom-safe-themes t) ; not sure, I'll probaby use very few themes no need to trust 'em all
+    (tool-bar-mode -1)
+    (toggle-scroll-bar -1)
+    (toggle-menu-bar-mode-from-frame -1)
+    (tooltip-mode -1)
+    (blink-cursor-mode 0)
+    (set-fringe-mode '(10 . 0))
+    (fset 'yes-or-no-p 'y-or-n-p))
+#+end_src
+
 ** Save Areas
 
 Emacs (and emacs packages) tend to store lot of files in the .emacs.d directory. This wouldn't be
@@ -138,6 +160,26 @@ shoud be part of the autosave file name.
       (add-to-list 'native-comp-eln-load-path (neo/litter-directory "eln" emacs-version)))
     (setq native-comp-async-report-warnings-errors 'silent))
 #+end_src
+
+  This is for native compilation. Should probably go in
+  ~early-init.org~ once we have it. After I figure out what actually
+  goes inside ~early-init.el~, maybe it is strictly for before-gui
+  things.
+  
+#+begin_src emacs-lisp
+    (if (and (fboundp 'native-comp-available-p)
+             (native-comp-available-p))
+        (progn
+          (message "Native compilation is available")
+          (setq comp-deferred-compilation t)
+          (setq package-native-compile t)
+          (setq native-comp-async-query-on-exit t)
+          (setq native-comp-async-jobs-number 0) ; use half of the cores
+          (setq native-comp-async-report-warnings-errors nil)
+          (setq comp-async-report-warnings-errors nil))
+      (message "Native complation is *not* available"))
+#+end_src
+
 ** Secrets
 ** Misc
 
