@@ -94,7 +94,9 @@ Speaking only for myself, claro?
     (setq inhibit-startup-buffer-menu t)
     (setq use-dialog-box nil)
     (setq ring-bell-function 'ignore)
+    (setq-default truncate-lines t)
     (setq custom-safe-themes t) ; not sure, I'll probaby use very few themes no need to trust 'em all
+    (put 'narrow-to-region 'disabled nil)
     (tool-bar-mode -1)
     (toggle-scroll-bar -1)
     (toggle-menu-bar-mode-from-frame -1)
@@ -130,6 +132,7 @@ I wan tit out of my emacs configuration.
 #+end_src
 
 *** Autosave
+**** Files
 By default autosave files are saved in the same directory of the file
 they're related to (I think the exception is that remote files are
 saved in some local temporary directory). I find this annoying, so I
@@ -143,6 +146,29 @@ shoud be part of the autosave file name.
   (setq auto-save-file-name-transforms
         `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
 #+end_src
+
+**** History
+#+begin_src emacs-lisp
+  (use-package emacs
+    :config
+    (savehist-mode))
+#+end_src
+
+*** Backups
+
+These is my configuration for backups. The directory itself is set by
+no-littering.
+
+#+begin_src emacs-lisp
+  (use-package emacs
+    :config
+    (setq backup-by-copying t)
+    (setq delete-old-versions t)
+    (setq kept-new-versions 6)
+    (setq kept-old-versions 2)
+    (setq version-control t))
+#+end_src
+
 *** Destop Save
 
 #+BEGIN_SRC emacs-lisp
