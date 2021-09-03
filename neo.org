@@ -79,6 +79,26 @@ arguments from the ~/proc~ file system, I only care about Linux anyhow.
     :bind
     ("C-x C-c" . neo/restart-emacs-or-exit))
 #+END_SRC
+** Package Configurations
+We use ~straight.el~ for package installation, but ~use-package~ for
+configuration. Here we setup a few useful extensions.
+
+The modeline becomes unwieldy when lot of minor modes try to say
+things there. We were using ~diminish~, but it seems that now
+~delight~ can completely replace it.
+
+#+begin_src emacs-lisp
+  (use-package delight)
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package emacs
+    :delight
+    (org-indent-mode)
+    (auto-revert-mode " AR")
+    (auto-fill-function " AF"))
+#+end_src
+
 ** Reasonable Defaults
 Speaking only for myself, claro?
 
@@ -212,7 +232,9 @@ no-littering.
 * Completion
 
 #+BEGIN_SRC emacs-lisp
-  (use-package ivy)
+  (use-package ivy
+    :delight
+    )
 #+END_SRC
 
 #+begin_src emacs-lisp
@@ -266,21 +288,22 @@ no-littering.
 
 #+begin_src emacs-lisp
   (use-package company
+    :delight
     :bind (:map company-active-map
-	   ("TAB" . company-complexivte-common-or-cycle)
-	   ("<tab>" . company-complete-common-or-cycle)
-	   ("<S-Tab>" . company-select-previous)
-	   ("<backtab>" . company-select-previous)
-	   ("C-n" . company-select-next)
-	   ("C-p" . company-select-previous))
+           ("TAB" . company-complexivte-common-or-cycle)
+           ("<tab>" . company-complete-common-or-cycle)
+           ("<S-Tab>" . company-select-previous)
+           ("<backtab>" . company-select-previous)
+           ("C-n" . company-select-next)
+           ("C-p" . company-select-previous))
     :hook (after-init . global-company-mode)
     :custom
     (company-require-match 'never)
     (company-minimum-prefix-length 2)
     (company-tooltip-align-annotations t)
     (company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
-			 company-preview-frontend
-			 company-echo-metadata-frontend))
+                         company-preview-frontend
+                         company-echo-metadata-frontend))
     (company-backends '(company-capf company-files))
     (company-tooltip-minimum-width 30)
     (company-tooltip-maximum-width 60))
