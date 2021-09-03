@@ -296,6 +296,12 @@ no-littering.
 * User Interface
 ** Appearance
 *** Themes
+#+begin_src emacs-lisp
+  (use-package doom-themes
+    :config
+    (load-theme 'doom-tomorrow-night t nil)
+    (load-theme 'doom-tomorrow-day t nil))
+#+end_src
 *** Modeline
 *** Icons
 *** Eyecandies
