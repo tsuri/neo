@@ -197,6 +197,11 @@ no-littering.
     (setq desktop-save t)
     (desktop-save-mode 1))
 #+END_SRC
+*** Variables
+
+I persist global variables by adding them to
+~deskop-globals-to-save~. I could have used savehist for this.
+
 ** Native Compilation
 
 #+begin_src emacs-lisp
@@ -320,11 +325,47 @@ no-littering.
 ** Appearance
 *** Themes
 #+begin_src emacs-lisp
-  (use-package doom-themes
-    :config
-    (load-theme 'doom-tomorrow-night t nil)
-    (load-theme 'doom-tomorrow-day t nil))
+   (defvar neo/current-theme 'doom-tomorrow-day "Theme applied")
+   (push 'neo/current-theme desktop-globals-to-save)
+  ; (load-theme neo/current-theme)
+  (defadvice load-theme (before theme-dont-propagate activate)
+  "Disable theme before loading new one."
+  (mapcar #'disable-theme custom-enabled-themes))
+
 #+end_src
+use counsel-load-theme
+
+#+begin_src emacs-lisp
+    (use-package doom-themes
+      :config
+  ;    (load-theme neo/current-theme nil))
+      (load-theme 'doom-tomorrow-night t t)
+      (load-theme 'doom-tomorrow-day t t))
+#+end_src
+
+(load-theme 'doom-tomorrow-night t nil)
+(setq neo/current-theme 'doom-tomorrow-night)
+
+(use-package twilight-theme)
+(use-package molokai-theme)
+
+(load-theme 'twilight 't 't) 
+(load-theme 'molokai 't 't)
+(enable-theme 'twilight)
+
+(progn
+(disable-theme 'twilight)
+(enable-theme 'molokai))
+
+(progn
+(disable-theme 'doom-tomorrow-day)
+(enable-theme 'doom-tomorrow-night))
+
+(progn
+(disable-theme 'doom-tomorrow-night)
+(enable-theme 'doom-tomorrow-day))
+
+
 *** Modeline
 *** Icons
 *** Eyecandies
