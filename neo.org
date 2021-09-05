@@ -261,9 +261,11 @@ I persist global variables by adding them to
     (ivy-mode 1)
     :bind
     ("<f2> f" . 'counsel-describe-function)
+;    ("<f2> F" . 'list-faces-display)
     ("<f2> v" . 'counsel-describe-variable)
     ("<f2> o" . 'counsel-describe-symbol)
     ("<f2> l" . 'counsel-find-library)
+    ("<f2> t" . 'neo/load-theme)	; for now, later we'll have a hydra/transient thing
     ("<f2> u" . 'counsel-unicode-char))
 #+end_src
 
@@ -324,23 +326,73 @@ I persist global variables by adding them to
 * User Interface
 ** Appearance
 *** Themes
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp 
    (defvar neo/current-theme 'doom-tomorrow-day "Theme applied")
    (push 'neo/current-theme desktop-globals-to-save)
-  ; (load-theme neo/current-theme)
-  (defadvice load-theme (before theme-dont-propagate activate)
-  "Disable theme before loading new one."
-  (mapcar #'disable-theme custom-enabled-themes))
-
 #+end_src
+
+#+begin_src emacs-lisp
+  (defun neo/load-theme ()
+    (interactive)
+    (ivy-read "Load custom theme: "
+              (mapcar 'symbol-name
+                      (custom-available-themes))
+              :action #'neo/load-theme-internal
+              :caller 'neo/load-theme))
+  #+end_src
+
+  #+begin_src emacs-lisp
+    ;;; need to do something fr powerline nd other modelines
+    (defun neo/load-theme-action (x)
+    (condition-case nil
+        (progn
+          (mapc #'disable-theme custom-enabled-themes)
+          (load-theme-internal (intern x) t))
+      (error "Problem loading theme %s" x)))
+#+end_src
+
+#+begin_src emacs-lisp
+      (defun neo/update-x-defaults ()
+        (with-temp-file "~/.Xdefaults"
+          (let ((foreground (face-attribute 'default :foreground))
+                (background (face-attribute 'default :background)))
+            (insert "emacs.fullscreen: maximized\n")
+            (insert (format "emacs.background: %s\n" background))
+            (insert (format "emacs.foreground: %s\n" foreground))))
+        (call-process-shell-command "xrdb -load ~/.Xdefaults" nil 0))
+      
+;      (add-hook 'emacs-kill-hook 'neo/update-x-defaults)
+#+end_src
+
+#+begin_src emacs-lisp
+  (defun neo/load-theme-internal (theme)
+    (let ((theme (if (stringp theme) (intern theme) theme)))
+      (message "Loading theme %s (disabling others)" theme)
+      (mapc #'disable-theme custom-enabled-themes)
+      (setq neo/current-theme theme)
+      (load-theme theme t)
+      (neo/update-x-defaults)
+      ;; We should really change the foreground only when org-hide-leading-stars is t.
+      ;; For me this is always true
+      (set-face-foreground 'org-superstar-leading (face-attribute 'default :background))
+      (set-face-foreground 'org-hide (face-attribute 'default :background))))
+  
+#+end_src
+    Emacs doesn't have a hook on theme changes, mainly because it is not
+  easy to define precisely what a theme switch is. Yet, we have a few
+  uses for a reasonable approximation, here it is:
+  
 use counsel-load-theme
 
 #+begin_src emacs-lisp
-    (use-package doom-themes
-      :config
-  ;    (load-theme neo/current-theme nil))
-      (load-theme 'doom-tomorrow-night t t)
-      (load-theme 'doom-tomorrow-day t t))
+    (use-package doom-themes)
+;      :config
+;      (load-theme 'doom-tomorrow-night t t)
+;      (load-theme 'doom-tomorrow-day t t))
+#+end_src
+
+#+begin_src emacs-lisp
+(add-hook 'desktop-after-read-hook (lambda () (neo/load-theme-internal neo/current-theme)))
 #+end_src
 
 (load-theme 'doom-tomorrow-night t nil)
@@ -460,7 +512,11 @@ I install the org-mode package very early in the init process because
 I want to use a newer version than what comes with Emacs.
 
 #+begin_src emacs-lisp
-  (use-package org-mode
+  (use-package org
+    :custom
+    (org-hide-emphasis-markers t)
+    (org-hide-leading-stars t)
+  
     :hook
     (org-mode . neo/org-mode-setup))
 #+end_src
@@ -503,6 +559,10 @@ I want to use a newer version than what comes with Emacs.
 
 #+begin_src emacs-lisp
   (use-package org-superstar
+    :custom
+    (org-superstar-special-todo-items t)
+    ;; not sure which setting of ~org-superstar-remove-leading-star~ I like the most
+    (org-superstar-remove-leading-stars nil)
     :config
     (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
     ;; (setq org-superstar-headline-bullets-list '("☰" "☷" "☵" "☲"  "☳" "☴"  "☶"  "☱" ))
@@ -512,7 +572,8 @@ I want to use a newer version than what comes with Emacs.
     (setq org-ellipsis " ↴ ")
     ;; TODO this is something that should be done at every theme switch.
     ;; we should have some form of hooks where we also generate a ~/.Xdefaults
-    (set-face-foreground 'org-superstar-leading (face-attribute 'default :background)))
+    (set-face-foreground 'org-superstar-leading (face-attribute 'default :background))
+    (set-face-foreground 'org-hide (face-attribute 'default :background)))
 #+end_src
 
 
