@@ -336,6 +336,12 @@ I persist global variables by adding them to
 * User Interface
 ** Appearance
 *** Themes
+
+**** Theme Switching
+Emacs doesn't have a hook on theme changes, mainly because it is not
+easy to define precisely what a theme switch is. Yet, we have a few
+uses for a reasonable approximation, here it is:
+
 #+begin_src emacs-lisp 
    (defvar neo/current-theme 'doom-tomorrow-day "Theme applied")
    (push 'neo/current-theme desktop-globals-to-save)
@@ -388,44 +394,36 @@ I persist global variables by adding them to
       (set-face-foreground 'org-hide (face-attribute 'default :background))))
   
 #+end_src
-    Emacs doesn't have a hook on theme changes, mainly because it is not
-  easy to define precisely what a theme switch is. Yet, we have a few
-  uses for a reasonable approximation, here it is:
+
+#+begin_src emacs-lisp
+  (add-hook 'desktop-after-read-hook (lambda () (neo/load-theme-internal neo/current-theme)))
+#+end_src
   
-use counsel-load-theme
+**** Themes
 
 #+begin_src emacs-lisp
-    (use-package doom-themes)
-;      :config
-;      (load-theme 'doom-tomorrow-night t t)
-;      (load-theme 'doom-tomorrow-day t t))
+  (use-package doom-themes)
 #+end_src
 
 #+begin_src emacs-lisp
-(add-hook 'desktop-after-read-hook (lambda () (neo/load-theme-internal neo/current-theme)))
+  (use-package modus-themes)  
 #+end_src
 
-(load-theme 'doom-tomorrow-night t nil)
-(setq neo/current-theme 'doom-tomorrow-night)
+#+begin_src emacs-lisp
+  (use-package twilight-theme)
+#+end_src
 
-(use-package twilight-theme)
-(use-package molokai-theme)
+#+begin_src emacs-lisp
+  (use-package molokai-theme)  
+#+end_src
 
-(load-theme 'twilight 't 't) 
-(load-theme 'molokai 't 't)
-(enable-theme 'twilight)
+#+begin_src emacs-lisp
+  (use-package dracula-theme)  
+#+end_src
 
-(progn
-(disable-theme 'twilight)
-(enable-theme 'molokai))
-
-(progn
-(disable-theme 'doom-tomorrow-day)
-(enable-theme 'doom-tomorrow-night))
-
-(progn
-(disable-theme 'doom-tomorrow-night)
-(enable-theme 'doom-tomorrow-day))
+#+begin_src emacs-lisp
+  (use-package blackboard-theme)
+#+end_src
 
 
 *** Modeline
