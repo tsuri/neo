@@ -243,7 +243,6 @@ I persist global variables by adding them to
 
 ** Secrets
 ** Misc
-
 * Completion
 
 #+BEGIN_SRC emacs-lisp
@@ -266,17 +265,18 @@ I persist global variables by adding them to
 #+end_src
 
 #+begin_src emacs-lisp
-  (use-package counsel
-    :config
-    (ivy-mode 1)
-    :bind
-    ("<f2> f" . 'counsel-describe-function)
-;    ("<f2> F" . 'list-faces-display)
-    ("<f2> v" . 'counsel-describe-variable)
-    ("<f2> o" . 'counsel-describe-symbol)
-    ("<f2> l" . 'counsel-find-library)
-    ("<f2> t" . 'neo/load-theme)	; for now, later we'll have a hydra/transient thing
-    ("<f2> u" . 'counsel-unicode-char))
+    (use-package counsel
+      :config
+      (ivy-mode 1)
+      :bind
+      ("<f2> f" . 'counsel-describe-function)
+  ;    ("<f2> F" . 'list-faces-display)
+      ("<f2> k" . describe-personal-keybindings)
+      ("<f2> v" . 'counsel-describe-variable)
+      ("<f2> o" . 'counsel-describe-symbol)
+      ("<f2> l" . 'counsel-find-library)
+      ("<f2> t" . 'neo/load-theme)	; for now, later we'll have a hydra/transient thing
+      ("<f2> u" . 'counsel-unicode-char))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -431,6 +431,27 @@ uses for a reasonable approximation, here it is:
 *** Eyecandies
 ** Keybindings
 *** Memory Aids
+There are a few keybindings in Emacs. Some are useful, and you won't
+remember them when needed.
+
+At times one remembers the beginning of a keybinding. ~which-key~ comes
+to the rescue and after a short delay shows all possible ways to
+extend that prefix. Not as precise as curated hydras, but has the big
+advantage of applying to all key bindings without further
+configuration.
+
+#+BEGIN_SRC emacs-lisp
+(use-package which-key
+  :init (which-key-mode)
+  :delight which-key-mode
+  :config
+  (setq which-key-idle-delay 0.3))
+#+END_SRC
+
+And remember the
+~describe-personal-keybindings~
+(~~<f2> k~~) that comes with ~use-package~.
+
 *** Global Keybindings
 
 * Movement
