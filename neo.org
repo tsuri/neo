@@ -3,24 +3,6 @@
 #+LANGUAGE: en
 #+PROPERTY: results silent
 
-This piece of emacs lisp is temporary only while I play with a
-pre-release of Emacs 28, with and without native compilation support.
-
-#+begin_src emacs-lisp
-(message system-configuration-options)
-
-(message system-configuration-features)
-
-(if (functionp 'json-serialize)
-  (message "Native JSON is available")
-(message "Native JSON is *not* available"))
-
-(if (and (fboundp 'native-comp-available-p)
-       (native-comp-available-p))
-  (message "Native compilation is available")
-(message "Native complation is *not* available"))
-#+end_src
-
 * Introduction
   This is my personal Emacs configuration. This is not the first time
   I declare [[https://www.emacswiki.org/emacs/DotEmacsBankruptcy][Emacs bankrupcy]] and start over with a new emacs life.
@@ -242,7 +224,25 @@ I persist global variables by adding them to
 #+end_src
 
 ** Secrets
+** Documentation
+#+begin_src emacs-lisp
+(use-package helpful
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key))
+#+end_src
+
 ** Misc
+#+begin_src emacs-lisp
+(use-package autorevert
+  :delight
+  :hook (after-init . global-auto-revert-mode))
+#+end_src
 * Completion
 
 #+BEGIN_SRC emacs-lisp
@@ -427,8 +427,62 @@ uses for a reasonable approximation, here it is:
 
 
 *** Modeline
+
+For now we take the easy path and install ~doom-modeline~. But there're
+interesting developements in SVG support to keep an eye on.
+
+#+BEGIN_SRC emacs-lisp
+(use-package doom-modeline
+  :init (doom-modeline-mode 1))
+#+END_SRC
+
 *** Icons
+#+begin_src emacs-lisp
+  (defun neo/maybe-install-fonts ()
+    (let ((font-dir (concat (or (getenv "XDG_DATA_HOME")
+                                (expand-file-name "~/.local/share"))
+                                 "/fonts/")))
+      (unless (file-exists-p (concat font-dir "all-the-icons.ttf"))
+        (all-the-icons-install-fonts t))))
+#+end_src
+
+#+begin_src emacs-lisp
+; should we use the after-init hook?
+  (use-package all-the-icons :config (neo/maybe-install-fonts))
+#+end_src
+
+*** Parenthesis
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :init
+    (progn
+      (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)))
+#+end_src
+
 *** Eyecandies
+#+begin_src emacs-lisp
+(use-package hl-todo
+  :hook ((prog-mode) . lc/hl-todo-init)
+  :init
+  (defun lc/hl-todo-init ()
+    (setq-local hl-todo-keyword-faces '(("HOLD" . "#cfdf30")
+                                        ("TODO" . "#ff9977")
+                                        ("NEXT" . "#b6a0ff")
+                                        ("PROG" . "#00d3d0")
+                                        ("FIXME" . "#ff9977")
+                                        ("DONE" . "#44bc44")
+                                        ("REVIEW" . "#6ae4b9")
+                                        ("DEPRECATED" . "#bfd9ff")))
+    (hl-todo-mode))
+  )
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package rainbow-mode
+    :config
+    (rainbow-mode))  
+#+end_src
+
 ** Keybindings
 *** Memory Aids
 There are a few keybindings in Emacs. Some are useful, and you won't
@@ -538,6 +592,39 @@ myself to use the command line git as little as possible.
 ** Linters
 ** Languages
 *** Emacs Lisp
+
+In eliasp mode, expanding macros is often an important complement to documentation.
+#+begin_src emacs-lisp
+  (use-package macrostep
+  :bind (:map  emacs-lisp-mode-map (("C-c e" . macrostep-expand))))
+#+end_src
+
+Paredit is useful for editing lisp code. If you do it often
+enough to remember the
+relative
+keybinding. For now I
+leave it disabled.
+#+begin_src emacs-lisp :tangle no
+(use-package paredit
+  :init
+  (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
+  (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+  (add-hook 'lisp-mode-hook #'enable-paredit-mode)
+  (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+  (add-hook 'scheme-mode-hook #'enable-paredit-mode)
+  :config
+  (show-paren-mode t)
+  :bind (("M-[" . paredit-wrap-square)
+         ("M-{" . paredit-wrap-curly))
+  :delight)
+#+end_src
+
+Bug Hunter bisects elisp files for you. You can thank me later :smile:
+
+#+begin_src emacs-lisp
+(use-package bug-hunter)
+#+end_src
+
 *** Python
 *** C++
 *** Haskell
