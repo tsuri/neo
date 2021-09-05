@@ -91,12 +91,22 @@ things there. We were using ~diminish~, but it seems that now
   (use-package delight)
 #+end_src
 
+In theory, this package is deprecated and the functionality built-in
+into ~use-package~. In practice, without it I cannot get the ~:chords~
+keyword to work.
+
 #+begin_src emacs-lisp
-  (use-package emacs
-    :delight
-    (org-indent-mode)
-    (auto-revert-mode " AR")
-    (auto-fill-function " AF"))
+  (use-package use-package-chords
+    :config (key-chord-mode 1))
+#+end_src
+
+  
+#+begin_src emacs-lisp
+    (use-package emacs
+      :delight
+      (org-indent-mode)
+      (auto-revert-mode " AR")
+      (auto-fill-function " AF"))
 #+end_src
 
 ** Reasonable Defaults
@@ -428,6 +438,16 @@ use counsel-load-theme
 * Movement
 
 * Undo
+Friends don't let friends use Emacs' builtin undo.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package undo-tree
+    :delight undo-tree-mode
+    :chords (("uu" . undo-tree-visualize))
+    :init (global-undo-tree-mode)
+    (setq undo-tree-visualizer-diff t)
+    (setq undo-tree-visualizer-timestamps t))
+#+END_SRC
 
 * Software Development
 
