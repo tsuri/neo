@@ -7,18 +7,29 @@ cd $DIR
 DEBIAN_VERSION=${1:-local}
 EMACS_VERSION=${2:-27.2}
 
+if [[ $(lsb_release --short --id) != "Debian" && ${DEBIAN_VERSION} == "local" ]]; then
+    echo "Local build are only supported on Debian hosts"
+    exit 1
+fi
+
 # Disable address space randomization; this is needed
 # for emacs dumping
 # TODO: check if this is still needed
 echo 0 | sudo tee /proc/sys/kernel/randomize_va_space
 
+if [[ EMACS_VERSION == "master" ]]; then
+    EMACS_CONFIG="--with-native-compilation"
+fi
+
 if [[ ${DEBIAN_VERSION} == "local" ]]; then
     DEBIAN_VERSION=$(lsb_release --codename --short)
     echo "Local build for Emacs ${EMACS_VERSION} on ${DEBIAN_VERSION}"
     ./scripts/install_dependencies ${DEBIAN_VERSION}
+    ./scripts/download ${EMACS_VERSION}
+    ./scripts/build ${EMACS_VERSION} ${EMACS_CONFIG}
 else
     echo "Docker build for Emacs ${EMACS_VERSION} on ${DEBIAN_VERSION}"
-    DOCKER_BUILDKIT=1 docker build -t emacs:${EMACS_VERSION} --build-arg EMACS_CONFIG=--with-native-compilation --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} --build-arg EMACS_VERSION=${EMACS_VERSION} -f ./Dockerfile . 
+    DOCKER_BUILDKIT=1 docker build -t emacs:${EMACS_VERSION} --build-arg EMACS_CONFIG="${EMACS_CONFIG}" --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} --build-arg EMACS_VERSION=${EMACS_VERSION} -f ./Dockerfile .
 fi
 
 # Re-enable address space randomization

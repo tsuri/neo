@@ -3,8 +3,10 @@
 EMACS_VERSION=${1:-27.2}
 
 if grep -sq 'docker\|lxc' /proc/1/cgroup; then
+    TOP_DIR="/emacs"
     SOURCE_DIR="/emacs"
 else
+    TOP_DIR="${EMACS_VERSION}"
     SOURCE_DIR="/usr/local/emacs_sources/${EMACS_VERSION}"
 fi
 
@@ -12,10 +14,10 @@ fi
 
 echo "Source in ${SOURCE_DIR}"
 
-if [ -d "./emacs" ]; then
-    echo "Existing emacs directory, bailing out. Please remove and rerun as needed"
-    exit 1
-fi
+# if [ -d "./emacs" ]; then
+#     echo "Existing emacs directory, bailing out. Please remove and rerun as needed"
+#     exit 1
+# fi
 
 ###
 #   Compile from master
@@ -51,7 +53,9 @@ EMACS_TAR_URL=${TAR_BASE_URL}/${TAR_FILENAME}
 EMACS_RELEASE_VERSION=${EMACS_VERSION%-rc*}
 
 if [[ ! -d ${SOURCE_DIR} ]]; then
-    wget --progress=bar:force:noscroll -qO- ${EMACS_TAR_URL} | tar xJ -f - -C $(dirname ${SOURCE_DIR}) --transform s/emacs-${EMACS_RELEASE_VERSION}/${EMACS_VERSION}/
+
+#    wget --progress=bar:force:noscroll -qO- ${EMACS_TAR_URL} | tar xJ -f - -C $(dirname ${SOURCE_DIR}) --transform s/emacs-${EMACS_RELEASE_VERSION}/${EMACS_VERSION}/
+    wget --progress=bar:force:noscroll -qO- ${EMACS_TAR_URL} | tar xJ -f - -C $(dirname ${SOURCE_DIR}) --transform s/emacs-${EMACS_RELEASE_VERSION}/${TOP_DIR}/
 fi
 
 # doesn't work in containers

@@ -1,6 +1,10 @@
 ARG DEBIAN_VERSION=bullseye
 FROM debian:${DEBIAN_VERSION} AS build
 
+RUN apt-get update && apt-get install -y lsb-release
+
+ENV USER=root
+
 COPY scripts /scripts
 
 RUN /scripts/install_dependencies ${DEBIAN_VERSION}
@@ -18,7 +22,9 @@ FROM debian:${DEBIAN_VERSION}
 
 COPY scripts /scripts
 
-RUN /scripts/install_dependencies
+RUN apt-get update && apt-get install -y lsb-release
+
+RUN /scripts/install_dependencies ${DEBIAN_VERSION}
 
 ARG GROUP_ID=1000
 ARG USER_ID=1000
