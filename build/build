@@ -17,13 +17,13 @@ fi
 # TODO: check if this is still needed
 echo 0 | sudo tee /proc/sys/kernel/randomize_va_space
 
-if [[ EMACS_VERSION == "master" ]]; then
+if [[ ${EMACS_VERSION} == "master" ]]; then
     EMACS_CONFIG="--with-native-compilation"
 fi
 
 if [[ ${DEBIAN_VERSION} == "local" ]]; then
     DEBIAN_VERSION=$(lsb_release --codename --short)
-    echo "Local build for Emacs ${EMACS_VERSION} on ${DEBIAN_VERSION}"
+    echo "Local build for Emacs ${EMACS_VERSION} (with ${EMACS_CONFIG}) on ${DEBIAN_VERSION}"
     ./scripts/install_dependencies ${DEBIAN_VERSION}
     ./scripts/download ${EMACS_VERSION}
     ./scripts/build ${EMACS_VERSION} ${EMACS_CONFIG}

@@ -39,8 +39,8 @@
 
   /Abandon All Hope, Ye Who Enter Here/
 
-  
-* General
+
+* General  
 ** System Configuration
 ** Emacs Startup
 When testing changes to the Emacs configuration it is useful to
@@ -79,22 +79,50 @@ arguments from the ~/proc~ file system, I only care about Linux anyhow.
 
 Future development, use transient
 #+begin_src emacs-lisp :tangle no
-(defun neo/exit-emacs (&optional args)
-  (interactive
-   (list (transient-args 'neo/exit-emacs-transient)))
-  (message "args %s" args))
-
-(define-transient-command neo/exit-emacs-transient ()
-       "Test Transient Title"
-       ["Arguments"
-        ("-s" "Switch" "--switch")
-        ("-a" "Another switch" "--another")
-        ("-m" "Message" "--message=")] ;; simpler
-       ["Actions"
-        ("r" "Restart Emacs" neo/exit-emacs)
-        ("x" "Exit Emacs" neo/exit-emacs)])
-
-(neo/exit-emacs-transient)
+  (use-package transient-posframe
+    :config
+  (transient-posframe-mode)
+  )
+  
+    (defun neo/exit-emacs (&optional args)
+      (interactive
+       (list (transient-args 'neo/exit-emacs-transient)))
+      (message "args %s" args))
+  
+    (define-transient-command neo/exit-emacs-transient ()
+           "Test Transient Title"
+           ["Releases"
+              ("-x" "Emacs" "--executable=")
+            ("-p" "Profile" "--with-profile=")]
+           ["Actions"
+            ("r" "Restart Emacs" neo/exit-emacs)
+            ("x" "Exit Emacs" neo/exit-emacs)])
+  
+    (neo/exit-emacs-transient)
+  
+  
+  (defun sort-emacs-releases (r1 r2)
+    (let ((n1 (car r1))
+          (t1 (cdr r1))
+          (n2 (car r2))
+          (t2 (cdr r2)))
+      (if (and (string-prefix-p "master-" n1)
+               (string-prefix-p "master-" n2))
+          (< t1 t2)
+        (if (string-prefix-p "master-" n1)
+            nil
+          (if (string-prefix-p "master-" n2)
+              t
+            (version< n1 n2))))))
+  
+  (setq l (sort (mapcar
+                 (lambda (e) (cons
+                              (car e)
+                              (time-convert (file-attribute-access-time (cdr e)) 'integer)))
+                 (directory-files-and-attributes "/usr/local/emacs_dist" nil "^[0-9a-z]" nil t)) #'sort-emacs-releases))
+  
+  (mapcar (lambda (e) (format "%s %s" (car e) (format-time-string "%Y %B %e" (cdr e)))) l)
+  
 #+end_src
 
 Let's add to the load path our own local packages. Some of them might
@@ -174,6 +202,8 @@ Speaking only for myself, claro?
     (setq-default truncate-lines t)
     (setq-default indent-tabs-mode nil)
     (setq custom-safe-themes t) ; not sure, I'll probaby use very few themes no need to trust 'em all
+    (setq scroll-conservatively 10000)    ; not sure abut this one
+    (setq scroll-preserve-screen-position t)
     (put 'narrow-to-region 'disabled nil)
     (tool-bar-mode -1)
     (toggle-scroll-bar -1)
@@ -181,7 +211,14 @@ Speaking only for myself, claro?
     (tooltip-mode -1)
     (blink-cursor-mode 0)
     (set-fringe-mode '(10 . 0))
-    (fset 'yes-or-no-p 'y-or-n-p))
+    (fset 'yes-or-no-p 'y-or-n-p)
+    ;; The following is mainly for avoiding the
+    ;; 'Symbolic link to Git-controlled source file; follow link? (y or n)'
+    ;; question every time I get to a package source via find-library or
+    ;; find-function. The question could be avoided with
+    ;; (setq vc-follow-symlinks t)
+    ;; but since we don't use VC at all, I take the nuclear option.
+    (setq vc-handled-backends nil))
 #+end_src
 
 ** Save Areas
@@ -311,11 +348,33 @@ I persist global variables by adding them to
 #+end_src
 
 #+begin_src emacs-lisp
-(use-package ws-butler
-  :hook ((text-mode . ws-butler-mode)
-         (prog-mode . ws-butler-mode)))
+  (use-package ws-butler   
+    :config
+    (setq ws-butler-keep-whitespace-before-point nil)
+    (ws-butler-global-mode)
+    :hook ((text-mode . ws-butler-mode)
+           (prog-mode . ws-butler-mode)))
 #+end_src
 
+#+begin_src emacs-lisp :tangle no
+  (use-package whitespace    
+    :config
+     (setq whitespace-style '(face trailing lines-tail))
+    (global-whitespace-mode 1))
+#+end_src
+
+Use explain-pause-top 
+#+begin_src emacs-lisp
+  (use-package explain-pause-mode
+    :straight (explain-pause-mode :type git :host github :repo "lastquestion/explain-pause-mode")
+    :config
+    (explain-pause-mode))
+#+end_src
+
+Use sudo for saving the occasional root-owned file.
+#+begin_src emacs-lisp
+(use-package sudo-save)
+#+end_src
 * Completion
 
 #+BEGIN_SRC emacs-lisp
@@ -498,6 +557,10 @@ uses for a reasonable approximation, here it is:
   (use-package blackboard-theme)
 #+end_src
 
+#+begin_src emacs-lisp
+(use-package monokai-theme)
+#+end_src
+
 *** Fonts
 
 #+begin_src emacs-lisp
@@ -543,6 +606,17 @@ uses for a reasonable approximation, here it is:
   (neo/set-font-faces)
 #+end_src
 
+*** Windows
+Allocate windows space.
+I don't know I like this (with more than 2 windows) and it might
+interfere with shackle and other ways we'll contol positioning of
+buffers.
+
+#+begin_src emacs-lisp
+  (use-package golden-ratio
+    :config
+    (golden-ratio-mode 1))
+#+end_src
 *** Modeline
 
 For now we take the easy path and install ~doom-modeline~. But there're
@@ -607,6 +681,21 @@ don't see anyhing, though. Maybe remove it
     (rainbow-mode))  
 #+end_src
 
+Not sure if the following is slowing down Emacs. I need to take a look
+at the implementation. It looks cool and is useful.
+#+begin_src emacs-lisp
+  (use-package beacon
+    :config
+    (beacon-mode 1)
+    ;; TODO make this theme dependent
+    (setq beacon-color "#50D050") ;; a light green
+   )
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package ansi-color)
+#+end_src
+
 ** Keybindings
 *** Memory Aids
 There are a few keybindings in Emacs. Some are useful, and you won't
@@ -662,6 +751,8 @@ chord, so that ~''~ can be used to switch window.
     ;; restored.
     (aw-leading-char-face ((t (:inherit ace-jump-face-foreground
                                         :font "FasterOne" :height 2.5 :foreground "dark gray" )))))
+  
+  (add-to-list 'golden-ratio-extra-commands 'ace-window)
 #+end_src
 
 * Undo
@@ -750,6 +841,20 @@ Forge allows to interact with GitHub (and similar deployments, git lab
 #+end_src
 
 
+** Build Systems
+
+Doesn't seem to do any coloring.
+
+#+begin_src emacs-lisp :tangle no
+(defun endless/colorize-compilation ()
+  "Colorize from `compilation-filter-start' to `point'."
+  (let ((inhibit-read-only t))
+    (ansi-color-apply-on-region
+     compilation-filter-start (point))))
+
+(add-hook 'compilation-filter-hook
+          #'endless/colorize-compilation)
+#+end_src
 ** Linters
 ** Languages
 *** Emacs Lisp
@@ -811,6 +916,20 @@ Bug Hunter bisects elisp files for you. You can thank me later :smile:
 
 #+begin_src emacs-lisp
 (use-package bazel)
+#+end_src
+
+*** TeX
+
+#+begin_src emacs-lisp
+      (setq straight-recipes-gnu-elpa-use-mirror t)
+      (straight-use-package 'auctex)
+      (use-package latex-preview-pane
+        :custom
+        (pdf-latex-command "xelatex"))
+
+      (latex-preview-pane-enable)
+      (add-hook 'LaTeX-mode-hook 'latex-preview-pane-mode)
+;      (TeX-engine-set 'xetex)
 #+end_src
 
 * Applications
@@ -912,8 +1031,8 @@ I want to use a newer version than what comes with Emacs.
     (set-face-foreground 'org-hide (face-attribute 'default :background)))
 #+end_src
 
-
-*** Org Roam
+*** Applications
+**** Org Roam
 
 Org roam is almost its own application.
 
@@ -1022,10 +1141,29 @@ Org roam is almost its own application.
   ;;          (("C-c n I" . org-roam-insert-immediate))))
 #+end_src
 
+**** Org Chef
+
+#+begin_src emacs-lisp
+  (use-package org-chef)
+  (setq org-capture-templates
+      '(("c" "Cookbook" entry (file "~/org/cookbook.org")
+         "%(org-chef-get-recipe-from-url)"
+         :empty-lines 1)
+        ("m" "Manual Cookbook" entry (file "~/org/cookbook.org")
+         "* %^{Recipe title: }\n  :PROPERTIES:\n  :source-url:\n  :servings:\n  :prep-time:\n  :cook-time:\n  :ready-in:\n  :END:\n** Ingredients\n   %?\n** Directions\n\n")))
+#+end_src
+**** Org Reveal
+
+#+begin_src emacs-lisp
+  (use-package ox-reveal)
+  ;; or from https://cdn.jsdelivr.net/npm/reveal.js
+  (setq org-reveal-root "file:///home/mav/.nvm/versions/node/v11.15.0/lib/node_modules/reveal.js")
+  (setq org-re-reveal-external-plugins  '((progress . "{ src: '%s/plugin/toc-progress/toc-progress.js', async: true, callback: function() { toc_progress.initialize(); toc_progress.create();} }")))
+#+end_src
 ** Dashboard
 ** Calculator
 ** Calendar
-** FIle Browser
+** File Browser
 ** Shell
 
 Look at more vterm/zsh configuration at
@@ -1067,6 +1205,13 @@ https://github.com/jwiegley/alert
   :config
   (setq alert-default-style 'notifications))
 #+end_src
+
+** File Browser
+
+#+begin_src emacs-lisp
+(use-package treemacs)
+#+end_src
+
 
 * Fun
 ** Music

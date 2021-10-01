@@ -17,6 +17,10 @@ else
     BUILD_SUFFIX=""
 fi
 
+if [[ ${NATIVE} == "native" ]]; then
+    NATIVE="--with-native-compilation"
+fi
+
 if [[ ${NATIVE} == "--with-native-compilation" ]]; then
     BUILD_SUFFIX="${BUILD_SUFFIX}-native"
 fi
@@ -38,7 +42,7 @@ cd ${SOURCE_DIR}
 
 mkdir -p ${BUILD_DIR}
 cd ${BUILD_DIR}
-${SOURCE_DIR}/configure --prefix ${TARGET_DIR} ${NATIVE}
+${SOURCE_DIR}/configure --with-libxml2 --prefix ${TARGET_DIR} ${NATIVE}
 
 make --jobs $(nproc) bootstrap
 make --jobs $(nproc)
