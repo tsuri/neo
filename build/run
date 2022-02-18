@@ -9,5 +9,5 @@ docker run  \
 --privileged --ipc host --rm --name emacs \
 -e DISPLAY=$DISPLAY  \
 -e UID="1000" -e GID="1000"  \
--v /home/mav:/data \
-emacs:${EMACS_VERSION}
+-v /home/mav:/home/mav \
+emacs:${EMACS_VERSION} /usr/local/bin/emacs --with-profile neo

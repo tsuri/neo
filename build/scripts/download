@@ -1,6 +1,7 @@
 #!/bin/bash
 
 EMACS_VERSION=${1:-27.2}
+GIT_SHA=${2:unknown}
 
 if grep -sq 'docker\|lxc' /proc/1/cgroup; then
     TOP_DIR="/emacs"
@@ -30,8 +31,11 @@ if [[ ${EMACS_VERSION} == "master" ]]; then
     else
 	git clone --depth 1 -b master git://git.sv.gnu.org/emacs.git ${SOURCE_DIR}
     fi
+    if [[ ${GIT_SHA} != "unknown" ]]; then
+        git checkout ${GIT_SHA}
+    fi
     chown --recursive ${USER} ${SOURCE_DIR}
-    # Nothing else to be one, the rest of the file deals with actual releases (or release candidates)
+    # Nothing else to be done, the rest of the file deals with actual releases (or release candidates)
     exit 0
 fi
 

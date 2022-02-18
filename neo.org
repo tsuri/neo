@@ -17,6 +17,8 @@
 :TOC:      :include all
 :END:
 
+For theming:
+https://github.com/fniessen/org-html-themes
 
 * Introduction
   This is my personal Emacs configuration. This is not the first time
@@ -89,7 +91,8 @@ Future development, use transient
        (list (transient-args 'neo/exit-emacs-transient)))
       (message "args %s" args))
   
-    (define-transient-command neo/exit-emacs-transient ()
+  
+  (define-transient-command neo/exit-emacs-transient ()
            "Test Transient Title"
            ["Releases"
               ("-x" "Emacs" "--executable=")

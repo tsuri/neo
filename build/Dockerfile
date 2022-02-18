@@ -10,6 +10,7 @@ COPY scripts /scripts
 RUN /scripts/install_dependencies ${DEBIAN_VERSION}
 
 ARG EMACS_VERSION=master
+ARG GIT_SHA=unknown
 RUN /scripts/download $EMACS_VERSION
 
 ARG EMACS_CONFIG
