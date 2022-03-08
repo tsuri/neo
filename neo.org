@@ -771,7 +771,10 @@ Friends don't let friends use Emacs' builtin undo.
 #+END_SRC
 
 * Software Development
-
+** Language Servers
+#+begin_src emacs-lisp
+(use-package eglot)
+#+end_src
 ** Version Control
 
 *** Git
@@ -908,6 +911,21 @@ Bug Hunter bisects elisp files for you. You can thank me later :smile:
 #+end_src
 
 *** Python
+*** Go
+#+begin_src emacs-lisp
+    (use-package go-mode
+      :hook
+      (go-mode . eglot-ensure))
+  
+    (defun neo/go-mode-hook ()
+      (add-hook 'before-save-hook 'gofmt-before-save)
+      (setq gofmt-command "goimports")
+      (add-hook 'before-save-hook 'gofmt-before-save)
+      (setq tab-width 8 indent-tabs-mode 1))
+  
+  (add-hook 'go-mode-hook 'neo/go-mode-hook)
+#+end_src
+
 *** C++
 *** Haskell
 *** Shell
@@ -1236,3 +1254,7 @@ https://github.com/jwiegley/alert
   :straight (:host github :repo "SqrtMinusOne/lyrics-fetcher.el"))
 #+end_src
 * Unclassified Packages
+* Inspiration
+
+https://github.com/a-schaefers/spartan-emacs
+
